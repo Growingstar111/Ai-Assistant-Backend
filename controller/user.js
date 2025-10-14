@@ -73,6 +73,7 @@ async function loginUser(req, res) {
         id: user._id,
         name: user.name,
         email: user.email,
+        assistantName :user.assistantName
       },
     });
   } catch (error) {
