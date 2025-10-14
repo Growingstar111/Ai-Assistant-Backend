@@ -2,7 +2,7 @@ const { User } = require("../model/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { generatedotp } = require("../commonFunction/commonFunction");
-const { sendEMail } = require("../commonFunction/nodeMailer");
+const { sendEMail } = require("../commonFunction/nodemailer");
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY || "defaultSecretKey";
 
