@@ -5,8 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendEMail = async (to, subject, text) => {
   try {
     const response = await resend.emails.send({
-      from: 'Smart AI Assistant <onboarding@resend.dev>', // use your verified sender if you add one
-      to,
+      from:process.env.RESEND_EMAIL, 
       subject,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -23,10 +22,10 @@ const sendEMail = async (to, subject, text) => {
       `,
     });
 
-    console.log(`✅ Email sent to ${to} (${subject})`);
+    console.log(`Email sent to ${to} (${subject})`);
     return response;
   } catch (error) {
-    console.error(`❌ Failed to send email to ${to}:`, error.message);
+    console.error(`Failed to send email to ${to}:`, error.message);
     throw error;
   }
 };

@@ -121,7 +121,7 @@ async function resendOtp(req, res) {
     user.otp = otp;
     await user.save();
 
-    // Send email asynchronously to avoid blocking the response
+    // Send email 
     sendEMail(
       email,
       "Your New Verification Code",
