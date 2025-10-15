@@ -34,11 +34,14 @@ const userSchema = new mongoose.Schema(
         type:String
     },
     assistantName: {
-      type: String, 
+      type: String,
     },
   },
   { timestamps: true }
 );
+
+
+userSchema.index({ otp: 1 }); 
 
 
 const User = mongoose.model("User", userSchema);

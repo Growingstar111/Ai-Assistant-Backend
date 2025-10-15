@@ -9,6 +9,10 @@ app.use(cors());
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 
+// Add compression for better performance
+const compression = require('compression');
+app.use(compression());
+
 const userRouter = require('./routes/user')
 const conversationRouter = require('./routes/conversation')
 const assistantRouter = require('./routes/assistant')
