@@ -27,19 +27,19 @@ async function registerUser(req, res) {
 
     await newUser.save();
 
-   
-    sendEMail(
-      email,
-      "Welcome to AI Assistant",
-      `Hello ${name}, your verification code is ${otp}`
-    ).catch(emailError => {
-      console.error(`Failed to send registration email to ${email}:`, emailError.message);
-     
-    });
-
     res.status(201).json({
       message: "User registered successfully. OTP sent to your email.",
       data: { name, email },
+    });
+    await sendEMail(
+      email,
+      "Welcome to AI Assistant",
+      `Hello ${name}, your verification code is ${otp}`
+    ).catch((emailError) => {
+      console.error(
+        `Failed to send registration email to ${email}:`,
+        emailError.message
+      );
     });
   } catch (error) {
     console.error("Register error:", error);
@@ -47,23 +47,24 @@ async function registerUser(req, res) {
   }
 }
 
-
 async function loginUser(req, res) {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({ message: "User not found" });
-
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch)
       return res.status(401).json({ message: "Incorrect password" });
 
-    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     user.token = token;
     await user.save();
@@ -75,8 +76,8 @@ async function loginUser(req, res) {
         id: user._id,
         name: user.name,
         email: user.email,
-        assistantName :user.assistantName,
-        isVerified:user.isVerified
+        assistantName: user.assistantName,
+        isVerified: user.isVerified,
       },
     });
   } catch (error) {
@@ -85,14 +86,12 @@ async function loginUser(req, res) {
   }
 }
 
-
 async function verifyOtp(req, res) {
   try {
     const { email, otp } = req.body;
 
     const user = await User.findOne({ email, otp });
-    if (!user)
-      return res.status(400).json({ message: "Invalid OTP" });
+    if (!user) return res.status(400).json({ message: "Invalid OTP" });
 
     user.isVerified = true;
     user.otp = null;
@@ -108,72 +107,70 @@ async function verifyOtp(req, res) {
   }
 }
 
-
 async function resendOtp(req, res) {
   try {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const otp = generatedotp();
     user.otp = otp;
     await user.save();
 
-    // Send email 
-    sendEMail(
+    res.status(200).json({ message: "OTP resent successfully" });
+
+    // Send email
+    await sendEMail(
       email,
       "Your New Verification Code",
       `Hello ${user.name || ""}, your new verification code is ${otp}`
-    ).catch(emailError => {
-      console.error(`Failed to send resend OTP email to ${email}:`, emailError.message);
+    ).catch((emailError) => {
+      console.error(
+        `Failed to send resend OTP email to ${email}:`,
+        emailError.message
+      );
     });
-
-    res.status(200).json({ message: "OTP resent successfully" });
   } catch (error) {
     console.error("Resend OTP error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
 
-
 async function forgotPassword(req, res) {
   try {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const otp = generatedotp();
     user.otp = otp;
     await user.save();
 
-   
-    sendEMail(
+    res.status(200).json({ message: "Password reset OTP sent to your email" });
+    await sendEMail(
       email,
       "Password Reset OTP",
       `Hello ${user.name || ""}, your password reset OTP is ${otp}`
-    ).catch(emailError => {
-      console.error(`Failed to send forgot password email to ${email}:`, emailError.message);
+    ).catch((emailError) => {
+      console.error(
+        `Failed to send forgot password email to ${email}:`,
+        emailError.message
+      );
     });
-
-    res.status(200).json({ message: "Password reset OTP sent to your email" });
   } catch (error) {
     console.error("Forgot Password error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
 
-
 async function resetPassword(req, res) {
   try {
     const { email, newPassword } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
@@ -186,7 +183,6 @@ async function resetPassword(req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
-
 
 async function logoutUser(req, res) {
   try {
