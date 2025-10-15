@@ -52,8 +52,6 @@ async function loginUser(req, res) {
     if (!user)
       return res.status(404).json({ message: "User not found" });
 
-    if (!user.isVerified)
-      return res.status(403).json({ message: "User not verified" });
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch)
@@ -73,7 +71,8 @@ async function loginUser(req, res) {
         id: user._id,
         name: user.name,
         email: user.email,
-        assistantName :user.assistantName
+        assistantName :user.assistantName,
+        isVerified:user.isVerified
       },
     });
   } catch (error) {
