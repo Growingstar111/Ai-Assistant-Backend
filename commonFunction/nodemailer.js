@@ -6,7 +6,8 @@ const sendEMail = async (to, subject, text) => {
   try {
     const response = await resend.emails.send({
       from:'Smart AI Assistant <onboarding@resend.dev>', 
-      subject,
+      to:to,
+      subject:subject,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
           <h2 style="color:#333;">${subject}</h2>
