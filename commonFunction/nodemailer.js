@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendEMail = async (to, subject, text) => {
   try {
     const response = await resend.emails.send({
-      from:process.env.RESEND_EMAIL, 
+      from:'Smart AI Assistant <onboarding@resend.dev>', 
       subject,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
