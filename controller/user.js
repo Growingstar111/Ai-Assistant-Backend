@@ -27,19 +27,16 @@ async function registerUser(req, res) {
 
     await newUser.save();
 
-    res.status(201).json({
-      message: "User registered successfully. OTP sent to your email.",
-      data: { name, email },
-    });
-    await sendEMail(
+    const emailResult = await sendEMail(
       email,
       "Welcome to AI Assistant",
       `Hello ${name}, your verification code is ${otp}`
-    ).catch((emailError) => {
-      console.error(
-        `Failed to send registration email to ${email}:`,
-        emailError.message
-      );
+    );
+
+    res.status(201).json({
+      message: "User registered successfully. OTP sent to your email.",
+      data: { name, email },
+      emailSent: emailResult
     });
   } catch (error) {
     console.error("Register error:", error);
@@ -118,18 +115,16 @@ async function resendOtp(req, res) {
     user.otp = otp;
     await user.save();
 
-    res.status(200).json({ message: "OTP resent successfully" });
-
-    // Send email
-    await sendEMail(
+    const emailResult = await sendEMail(
       email,
       "Your New Verification Code",
       `Hello ${user.name || ""}, your new verification code is ${otp}`
-    ).catch((emailError) => {
-      console.error(
-        `Failed to send resend OTP email to ${email}:`,
-        emailError.message
-      );
+    );
+
+
+    res.status(200).json({ 
+      message: "OTP resent successfully",
+      emailSent: emailResult 
     });
   } catch (error) {
     console.error("Resend OTP error:", error);
@@ -148,16 +143,15 @@ async function forgotPassword(req, res) {
     user.otp = otp;
     await user.save();
 
-    res.status(200).json({ message: "Password reset OTP sent to your email" });
-    await sendEMail(
+    const emailResult = await sendEMail(
       email,
       "Password Reset OTP",
       `Hello ${user.name || ""}, your password reset OTP is ${otp}`
-    ).catch((emailError) => {
-      console.error(
-        `Failed to send forgot password email to ${email}:`,
-        emailError.message
-      );
+    );
+
+    res.status(200).json({ 
+      message: "Password reset OTP sent to your email",
+      emailSent: emailResult 
     });
   } catch (error) {
     console.error("Forgot Password error:", error);
